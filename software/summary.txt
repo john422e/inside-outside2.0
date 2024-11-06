@@ -1,0 +1,5 @@
+1. Audio Feedback Mode:
+	-4 mic synths listening to each input
+	-4 output synths with a limiter and EQ built in
+
+2. 

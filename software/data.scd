@@ -5,7 +5,7 @@
 // global data, run this second
 ~sampleRate = 48000;
 ~numInputs = 4; // analog inputs (quartet mics)
-~numOutputs = 4; // analog outputs (quartet speakers)
+~numOutputs = 6; // analog outputs (quartet speakers)
 ~numSines = 8; // how many sine waves to include in sinBank synth
 
 // gain levels
@@ -14,16 +14,13 @@ PREAMPS ON INTERFACE:
 mics 1-3 at 10db
 mic 4 (cello) at 8 db
 */
-~sineSynthGain = 0.005;
+~inputOffset = 2; // if not starting with first input
+~sineSynthGain = 0.03;
 ~liveMicInputGain = 0.9;
 ~liveMicLimiter = 0.03;
 ~liveMicAmp = 0.1;
 ~fieldPlaybackAmp = 0.1;
 ~pianoAmp = 0.05;
-
-
-
-
 
 ~currentData = Array.fill(~numInputs, {
 	[
@@ -38,8 +35,9 @@ mic 4 (cello) at 8 db
 ~pingBufTime=0.5;
 ~cwd = PathName.new(thisProcess.nowExecutingPath).parentPath;
 ~temps = Array.fill( ~numInputs, { arg i; ~cwd ++ "temp" ++ i.asString ++ ".wav"});
+~fastRelease = 0.1;
 
-~synthSusTime = 5; // how long to hold the sinSynths before releasing
+~synthSusTime = 20; // how long to hold the sinSynths before releasing
 
 // use these with the ~filterList in functions.scd
 

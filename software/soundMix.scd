@@ -1,3 +1,25 @@
+
+recs[chan].record(temps[chan], ~micBusses[chan], numChannels: 1);
+temps = Array.fill( ~numSources, { arg i; cwd ++ "temp" ++ i.asString ++ ".wav"});
+
+
+// start recording
+~recs[0].record(~temps[0], ~micSamplerBuses[0], numChannels: 1);
+// wait a bit
+// stop recording
+~recs[0].stopRecording;
+// wait a tiny bit
+// ping analysis server
+~localHost.sendMsg('/ping', 0); // supply channel number
+// turn synths off
+~sineSynths[0].set(\gate, 0);
+0.11.wait; // for release
+~sineSynths[0].set(\freqs, ~currentData[0][1]);
+~sineSynths[0].set(\freqs, ~currentData[0][1]);
+~sineSynths[0].set(\amps, ~currentData[0][0]); // set
+~sineSynths[0].set(\gate, 1); // turn back on
+
+
 (
 // build all the synth and bus objects
 
@@ -26,16 +48,17 @@
 // // 4 live mic buses for feedback
 // ~micLiveBuses = Array.fill(~numInputs, { Bus.audio(s, 1) });
 // // 4 buses for sample recordings
-// ~micSamplerBuses = Array.fill(~numInputs, { Bus.audio(s, 1) });
+~micSamplerBuses = Array.fill(~numInputs, { Bus.audio(s, 1) });
 // // 4 buses for sine synths
 // ~sinesBuses = Array.fill(~numInputs, { Bus.audio(s, 1) });
 // // 4 buses for piano FR playback
 // ~pianoBuses = Array.fill(~numInputs, { Bus.audio(s, 1) });
 
 // build synths and assign to buses
-~micLiveSynths = Array.fill(~numInputs, { arg i; Synth.new(\micLive, [\in, i, \inputGain, 0.0, \amp, 0, \out, i] )}); // these need to go to buses eventually
-//~micSamplerSynths = Array.fill(~numInputs, { arg i; Synth.new(\micSampler, [\in, i, \out, i] )});
-~sineSynths = Array.fill( ~numInputs, { arg i; Synth.new(\sinBank_x, [\out, i] )});
+~micSamplerSynths = Array.fill(~numInputs, { arg i; Synth.new(\micSampler, [\in, i + ~inputOffset, \out, ~micSamplerBuses[i]] )});
+~micLiveSynths = Array.fill(~numInputs, { arg i; Synth.new(\micLive, [\in, i + ~inputOffset, \inputGain, 0.0, \amp, 0, \out, i] )}); // these need to go to buses eventually
+
+~sineSynths = Array.fill( ~numInputs, { arg i; Synth.new(\sinBank_x, [\amp, 0, \out, i] )});
 
 // direct outs I NEED TO FIGURE THIS OUT< WHY ARE THEY ALL DUPLICATING CHANNEL ONE TO ALL FOUR CHANNELS?
 // adjust \amp here for ensemble speaker levels
@@ -70,20 +93,13 @@ Task{
 	~salemCovPlayer = Synth.new(\bufPlay_stereo, [\buf, ~salemCovBuf, \amp, 3, \out, 4]);
 
 	"DONE".postln;
+	~fieldBuffers = [~cemeteryPlayer, ~salemCovPlayer];
+	~pianoiBuffers = [~vln1Player, ~vln2Player, ~vlaPlayer, ~vcPlayer];
 }.start;
 
 )
 
 
-(
-// start everything
-// startPos = time in samples (48k)
-~cemeteryPlayer.set(\startPos, 0, \t_trig, 1, \amp, ~fieldPlaybackAmp, \gate, 1);
-~salemCovPlayer.set(\startPos, 48000 * 120, \t_trig, 1, \amp, ~fieldPlaybackAmp, \gate, 1);
-~vln1Player.set(\startPos, 48000 * 120, \t_trig, 1, \amp, ~pianoAmp, \gate, 1);
-~vln2Player.set(\startPos, 48000 * 120, \t_trig, 1, \amp, ~pianoAmp, \gate, 1);
-~vlaPlayer.set(\startPos, 48000 * 120, \t_trig, 1, \amp, ~pianoAmp, \gate, 1);
-~vcPlayer.set(\startPos, 48000 * 120, \t_trig, 1, \amp, ~pianoAmp, \gate, 1);
 s.freeAll;
 
 s.meter;
@@ -94,10 +110,7 @@ s.plotTree;
 // turn off
 ~sineSynths.do( {arg synth; synth.set(\gate, 0); });
 
-// turn on
-~micLiveSynths.do( { arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, ~liveMicAmp) });
-// turn off
-~micLiveSynths.do( { arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, 0) });
+
 
 //a = Array.fill(8, { 500.rand + 100 });
 

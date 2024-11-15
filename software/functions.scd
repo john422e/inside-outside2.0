@@ -74,4 +74,77 @@
 	};
 	filteredList;
 };
+
+
+// MAKE SINGLE HOST
+~makeHost = {
+	arg hostname = "127.0.0.1", port=10000;
+	var host;
+	host = NetAddr.new( hostname, port);
+	host;
+};
+// MAKE HOST ARRAY
+~makeHosts = {
+	arg hostnames, port=10000;
+	var hosts;
+	hosts = Array.fill( hostnames.size, { arg i; NetAddr.new( hostnames[i], port)});
+	hosts;
+};
+
+~sampleIt = {
+	arg channel;
+	var sampleStream;
+	sampleStream = Task.new( {
+		// wait after trigger
+		~pianoWaitTime.wait;
+		// start recording
+		~recs[channel].record(~temps[channel], ~micSamplerBuses[channel], numChannels: 1);
+		// wait
+		~sampleDur.wait;
+		// stop recording
+		~recs[channel].stopRecording;
+		// wait again to make sure file gets written to disk
+		~recBufTime.wait;
+		// ping analysis server
+		~localHost.sendMsg('/ping', 0); // supply channel number
+		// wait a bit to make sure analysis server responds
+		~pingBufTime.wait;
+		// turn synth off (just in case it's on)
+		~sineSynths[channel].set(\release, ~fastRelease, \gate, 0);
+		~fastRelease.wait; // for release
+		~sineSynths[channel].set(\freqs, ~currentData[channel][1]);
+		~sineSynths[channel].set(\freqs, ~currentData[channel][1]);
+		~sineSynths[channel].set(\amps, ~currentData[channel][0]); // set
+		~sineSynths[channel].set(\amp, ~sineSynthGain, \gate, 1); // turn back on
+		~synthSusTime * 0.65.wait;
+		// turn off (need to finesse this with a fade)
+		~sineSynths[channel].set(\release, (~synthSusTime * 0.5), \gate, 0);
+		~synthSusTime * 0.35.wait;
+		// turn on audio feedback if it's not in a silent section
+		if(~silent == false) { ~micLiveSynths[channel].set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, ~liveMicAmp) };
+	});
+	sampleStream.start;
+};
+
+// master stop (without quitting server) -- will this work without defining ~main first?
+~stop = {
+	"STOPPING THE PIECE".postln;
+	// stop main loop
+	~main.stop;
+	// stop tempoClock
+	t.stop;
+	// stop buffers
+	~fieldBuffers.do{ arg buff; buff.set(\gate, 0) };
+	~pianoBuffers.do{ arg buff; buff.set(\gate, 0) };
+};
+
+
+// exits remote chuck server
+~shutdownRemoteServer = {
+	arg hosts;
+	hosts.do( {
+		arg host;
+		host.sendMsg( '/endProgram');
+	});
+};
 )

@@ -20,7 +20,7 @@ mic 4 (cello) at 8 db
 ~liveMicInputGain = 0.9;
 ~liveMicLimiter = 0.03;
 ~liveMicAmp = 0.1;
-~fieldPlaybackAmp = 0.1;
+~fieldPlaybackAmp = 0.15;
 ~pianoAmp = 0.05;
 
 ~currentData = Array.fill(~numInputs, {

@@ -6,8 +6,8 @@
 // event times (in seconds) of all piano notes
 ~vln1PianoTimes = [160, 210, 240, 276, 315, 345, 380, 470, 558, 580, 592, 600, 610, 615]; // vln1
 ~vln2PianoTimes = [185, 225, 265, 300, 341, 378, 465, 489, 550, 575, 590, 595, 612, 625]; // vln2
-~vlaPianoTimes = [170, 205, 245, 290, 332, 360, 441, 475, 548, 566, 575, 585, 600, 608, 622]; // vla
-~vcPianoTimes = [186, 206, 260, 300, 330, 386, 420, 480, 546, 560, 580, 595, 610, 626]; // vc
+~vlaPianoTimes = [170, 205, 245, 290, 332, 360, 450, 475, 548, 566, 575, 585, 600, 608, 622]; // vla
+~vcPianoTimes = [186, 206, 260, 300, 330, 386, 480, 546, 560, 580, 595, 610, 626]; // vc
 
 
 ~pianoEvents = [~vln1PianoTimes, ~vln2PianoTimes, ~vlaPianoTimes, ~vcPianoTimes];

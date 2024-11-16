@@ -2,6 +2,58 @@
 // 8
 // dependencies: ______
 
+
+// MAKE SURE SECONDS IS SET TO 0 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+~secondCount = 0; // set for rehearsal/sound checking;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+check times:
+FR and audio feedback: 40 seconds
+// 2:00 (119)
+harmonic feedback and piano: 2:30 (150)
+525 (8:45) for bowed balance
+*/
+
+
+
+// SECONDS TO ZERO
+
 ~stop.();
 
 
@@ -12,16 +64,9 @@
 // this is working, but i need to make sustain longer and add to main loop
 
 
-/*
-check times:
-FR and audio feedback: 40 seconds
-harmonic feedback and piano: 2:30 (150)
-*/
-
 (
 ~pieceLength = 11 * 60; //seconds
 ~tempo = (60/60); // BPM =(x/60)
-//~secondCount = 0; // don't set here for rehearsal/sound checking; set seconds on 54
 
 
 // get event times and save in own array for easy reference
@@ -51,7 +96,7 @@ t = TempoClock.new(~tempo, ~secondCount);
 
 
 	// INITIALIZATION
-	~seconds = 149; // can update this for rehearsal purposes to jump around
+	~seconds = ~secondCount; // can update this for rehearsal purposes to jump around
 
 
 	// put these in a list dude
@@ -143,6 +188,6 @@ while { i < 5 } { i = i + 1; "boing".postln };
 ~setPianoMains.(4.0); // 1.0 by default
 ~setMicMains.(1.5);
 
-~fieldPlayers.do( { arg synth; synth.set(\amp, 0.1)}); // 0.1 by default
+~fieldPlayers.do( { arg synth; synth.set(\amp, 0.15)}); // 0.1 by default
 
 ~micLiveSynths.do( {arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, 1.0) });

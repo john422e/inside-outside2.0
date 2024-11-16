@@ -124,7 +124,9 @@ Task.new( {
 		\pan1, -1, \pan2, -0.5, \pan3, 0.5, \pan4, 1, \pan5, -1, \pan6, -0.5, \pan7, 0.5, \pan8, 1, \pan9, -1, \pan10, -0.5, \pan11, 0.5, \pan12, 1,
 		\amp1, 1.0, \amp2, 1.0, \amp3, 1.0, \amp4, 1.0, \amp5, 1.0, \amp6, 1.0, \amp7, 1.0, \amp8, 1.0, \amp9, 1.0, \amp10, 1.0, \amp11, 1.0, \amp12, 1.0,
 		\masterAmp, 0.5, \out, 4]);
+	"READY".postln;
 }).start;
+
 
 )
 

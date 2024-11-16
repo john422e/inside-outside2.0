@@ -38,11 +38,14 @@ SynthDef.new( \directOut, {
 )
 
 x = Synth.new(\sinOsc, [\out, ~instBus]);
-y = Synth.new( \houseMixer, [\bus1, ~instBus, \bus1pan, 1.0, \bus1amp, 0.5, \out, 0], addAction: 'addToTail');
 z = Synth.new( \directOut, [\bus, ~instBus, \out, 0], addAction: 'addToTail');
+y = Synth.new( \houseMixer, [\bus1, ~instBus, \bus1pan, 1.0, \bus1amp, 0.5, \out, 3], addAction: 'addToTail');
 
+y.set(\bus1pan, -1.0);
 y.set(\bus1amp, 0.1);
 x.set(\gate, 1);
+x.set(\gate, 0);
+s.freeAll;
 s.quit;
 
 /*

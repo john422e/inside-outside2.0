@@ -1,18 +1,27 @@
 // main.scd
+// 8
 // dependencies: ______
 
 ~stop.();
 
 
-~sampleIt.(0);
+~sampleIt.(3);
+~silent = true;
+~silent = false;
 
 // this is working, but i need to make sustain longer and add to main loop
 
 
+/*
+check times:
+FR and audio feedback: 40 seconds
+harmonic feedback and piano: 2:30 (150)
+*/
+
 (
 ~pieceLength = 11 * 60; //seconds
-~tempo = (240/60); // BPM =(x/60)
-~secondCount = 0; // change this for rehearsal
+~tempo = (60/60); // BPM =(x/60)
+//~secondCount = 0; // don't set here for rehearsal/sound checking; set seconds on 54
 
 
 // get event times and save in own array for easy reference
@@ -25,6 +34,13 @@
 s.meter;
 ~silent = false;
 
+// 15 db on the preamps
+
+// set house levels
+~setSinesMains.(0.30); // 1.0 by default
+~setPianoMains.(4.0); // 1.0 by default
+~setMicMains.(1.5);
+
 // tempo clock
 t = TempoClock.new(~tempo, ~secondCount);
 
@@ -35,12 +51,12 @@ t = TempoClock.new(~tempo, ~secondCount);
 
 
 	// INITIALIZATION
-	~seconds = 0; // can update this for rehearsal purposes to jump around
+	~seconds = 149; // can update this for rehearsal purposes to jump around
 
 
 	// put these in a list dude
-	~fieldBuffers.do{ arg buff; buff.set(\startPos, ~sampleRate * ~seconds, \t_trig, 1, \amp, ~fieldPlaybackAmp, \gate, 1) };
-	~pianoBuffers.do{ arg buff; buff.set(\startPos, ~sampleRate * ~seconds, \t_trig, 1, \amp, ~pianoAmp, \gate, 1) };
+	~fieldPlayers.do{ arg buff; buff.set(\startPos, ~sampleRate * ~seconds, \t_trig, 1, \amp, ~fieldPlaybackAmp, \gate, 1) };
+	~pianoPlayers.do{ arg buff; buff.set(\startPos, ~sampleRate * ~seconds, \t_trig, 1, \amp, ~pianoAmp, \gate, 1) };
 
 
 	// MAIN LOOP
@@ -62,7 +78,7 @@ t = TempoClock.new(~tempo, ~secondCount);
 				~eventCounter = ~eventCounter + 1;
 				// fork the sampling process here
 				["FORKING", i].postln;
-				~sampleIt(i).fork;
+				{~sampleIt.(i)}.fork;
 			});
 		});
 		// check for silences
@@ -72,7 +88,7 @@ t = TempoClock.new(~tempo, ~secondCount);
 			~eventCounter = ~eventCounter + 1;
 			// go through all synths and silence them /gate 0
 			// turn off
-			~micLiveSynths.do( { arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, 0) });
+			~micLiveSynths.do( { arg synth; synth.set(\gate, 0) });
 		});
 		// check for FB starts
 		if( ~fbStarts.includesEqual(time), {
@@ -81,7 +97,7 @@ t = TempoClock.new(~tempo, ~secondCount);
 			~eventCounter = ~eventCounter + 1;
 			// turn on FB synths
 			// turn on
-			~micLiveSynths.do( { arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, ~liveMicAmp) });
+			~micLiveSynths.do( { arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \gate, 1) });
 		});
 
 /*		if( ~eventTimes.includesEqual(t.beats), {
@@ -98,7 +114,7 @@ t = TempoClock.new(~tempo, ~secondCount);
 	});
 
 	// shutdown python server when finished
-	//~localHost.sendMsg('/shutdown');
+	~localHost.sendMsg('/shutdown');
 	~eventCounter.postln;
 }).start;
 
@@ -114,3 +130,19 @@ t.stop;
 i = 0;
 while { i < 5 } { i = i + 1; "boing".postln };
 )
+
+~fieldPlayers.do( { arg synth; synth.set(\gate, 1) });
+
+
+// SET HOUSE LEVELS HERE
+~houseMixer.set(\masterAmp, 0.0);
+~houseMixer.set(\masterAmp, 0.8);
+// these are set separately, not on the hosue mix
+~fieldPlayers.do( { arg synth; synth.set(\amp, 0)}); // 0.1 by default
+~setSinesMains.(0.30); // 1.0 by default
+~setPianoMains.(4.0); // 1.0 by default
+~setMicMains.(1.5);
+
+~fieldPlayers.do( { arg synth; synth.set(\amp, 0.1)}); // 0.1 by default
+
+~micLiveSynths.do( {arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, 1.0) });

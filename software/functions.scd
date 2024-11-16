@@ -1,4 +1,5 @@
 // functions.scd
+// 2
 // no dependencies
 
 // global functions, run this first (should not reference anything in data.scd or elsewhere)
@@ -95,10 +96,12 @@
 	arg channel;
 	var sampleStream;
 	sampleStream = Task.new( {
+		// turn off feedback
+		~micLiveSynths[channel].set(\gate, 0);
 		// wait after trigger
 		~pianoWaitTime.wait;
 		// start recording
-		~recs[channel].record(~temps[channel], ~micSamplerBuses[channel], numChannels: 1);
+		~recs[channel].record(~temps[channel], ~micSamplerBusses[channel], numChannels: 1);
 		// wait
 		~sampleDur.wait;
 		// stop recording
@@ -115,15 +118,45 @@
 		~sineSynths[channel].set(\freqs, ~currentData[channel][1]);
 		~sineSynths[channel].set(\freqs, ~currentData[channel][1]);
 		~sineSynths[channel].set(\amps, ~currentData[channel][0]); // set
-		~sineSynths[channel].set(\amp, ~sineSynthGain, \gate, 1); // turn back on
+		~sineSynths[channel].set(\amp, 1.0, \gate, 1); // turn back on
 		~synthSusTime * 0.65.wait;
 		// turn off (need to finesse this with a fade)
-		~sineSynths[channel].set(\release, (~synthSusTime * 0.5), \gate, 0);
+		~sineSynths[channel].set(\release, (~synthSusTime * 0.65), \gate, 0);
 		~synthSusTime * 0.35.wait;
 		// turn on audio feedback if it's not in a silent section
-		if(~silent == false) { ~micLiveSynths[channel].set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, ~liveMicAmp) };
+		if(~silent == false) { ~micLiveSynths[channel].set(\gate, 1) };
 	});
 	sampleStream.start;
+};
+
+~setSinesMains = {
+	arg amp;
+	~numInputs.do( { arg i;
+		~houseMixer.set(\amp1, amp);
+		~houseMixer.set(\amp2, amp);
+		~houseMixer.set(\amp3, amp);
+		~houseMixer.set(\amp4, amp);
+	});
+};
+
+~setMicMains = {
+	arg amp;
+	~numInputs.do( { arg i;
+		~houseMixer.set(\amp5, amp);
+		~houseMixer.set(\amp6, amp);
+		~houseMixer.set(\amp7, amp);
+		~houseMixer.set(\amp8, amp);
+	});
+};
+
+~setPianoMains = {
+	arg amp;
+	~numInputs.do( { arg i;
+		~houseMixer.set(\amp9, amp);
+		~houseMixer.set(\amp10, amp);
+		~houseMixer.set(\amp11, amp);
+		~houseMixer.set(\amp12, amp);
+	});
 };
 
 // master stop (without quitting server) -- will this work without defining ~main first?
@@ -133,9 +166,14 @@
 	~main.stop;
 	// stop tempoClock
 	t.stop;
+	// stop synths;
+	~micLiveSynths.do( { arg synth, i; synth.set(\amp, 0) });
+	~sineSynths.do( {arg synth, i; synth.set(\gate, 0)});
 	// stop buffers
-	~fieldBuffers.do{ arg buff; buff.set(\gate, 0) };
-	~pianoBuffers.do{ arg buff; buff.set(\gate, 0) };
+	~fieldPlayers.do{ arg buff; buff.set(\gate, 0) };
+	~pianoPlayers.do{ arg buff; buff.set(\gate, 0) };
+	// free synths
+	//s.freeAll;
 };
 
 

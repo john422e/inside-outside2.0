@@ -1,4 +1,5 @@
 // soundServer.scd
+// 5
 
 // server settings and synthDefs, run this ___
 s.quit;
@@ -29,7 +30,7 @@ o.outDevice_("Audient EVO16");
 
 // o.inDevice_("SQ - Audio");
 // o.outDevice_("SQ - Audio");
-s.boot;
+//s.boot;
 )
 s.boot;
 // boot synth, go to synths.scd and add synths

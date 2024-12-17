@@ -1,7 +1,7 @@
 // main.scd
 // 8
 // dependencies: ______
-
+// 1. piano 2. field 3. FB
 
 // MAKE SURE SECONDS IS SET TO 0 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ~secondCount = 0; // set for rehearsal/sound checking;
@@ -57,7 +57,7 @@ harmonic feedback and piano: 2:30 (150)
 ~stop.();
 
 
-~sampleIt.(3);
+//~sampleIt.(3);
 ~silent = true;
 ~silent = false;
 
@@ -65,7 +65,7 @@ harmonic feedback and piano: 2:30 (150)
 
 
 (
-~pieceLength = 11 * 60; //seconds
+~pieceLength = 11 * 60; //= //- ~secondCount//seconds
 ~tempo = (60/60); // BPM =(x/60)
 
 
@@ -176,18 +176,46 @@ i = 0;
 while { i < 5 } { i = i + 1; "boing".postln };
 )
 
+
+// RUN SOME SOUND HERE
 ~fieldPlayers.do( { arg synth; synth.set(\gate, 1) });
 
 
 // SET HOUSE LEVELS HERE
 ~houseMixer.set(\masterAmp, 0.0);
-~houseMixer.set(\masterAmp, 0.8);
+~houseMixer.set(\masterAmp, 0.9); // 0.8 by default DEFINITELY DO THIS
+
+
+
+
 // these are set separately, not on the hosue mix
-~fieldPlayers.do( { arg synth; synth.set(\amp, 0)}); // 0.1 by default
-~setSinesMains.(0.30); // 1.0 by default
-~setPianoMains.(4.0); // 1.0 by default
-~setMicMains.(1.5);
+~fieldPlayers.do( { arg synth; synth.set(\amp, 0.25)}); // 0.15 by default
+~setSinesMains.(0.6); // 1.0 by default TRY THIS BUT MAYBE JUST A LITTLE: MINIMUM IS 0.3
+// bring piano in mains up here TRY THIS
 
-~fieldPlayers.do( { arg synth; synth.set(\amp, 0.15)}); // 0.1 by default
 
-~micLiveSynths.do( {arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, 1.0) });
+
+
+~setPianoMains.(4.5); // 1.0 by default go up to 4?
+~setMicMains.(0.75); // bring this up? TRY THIS
+~fieldPlayers.do( { arg synth; synth.set(\amp, 0.6)}); // 0.1 by default 0.4 0.5????
+
+//~micLiveSynths.do( {arg synth; synth.set(\inputGain, ~liveMicInputGain, \limiter, ~liveMicLimiter, \amp, 1.0) });
+
+// bring these up/down in quartet
+~sinesDOs.do( { arg synth; synth.set(\amp, 0.015)}); // sine synth gain down a bit in quartet
+~pianoDOs.do( { arg synth; synth.set(\amp, 0.1)}); // pianos up a bit in quartet
+~micLiveDOs.do( { arg synth; synth.set(\amp, 0.15)}); // live mics up a bit in quartet
+
+
+
+
+
+
+// defaults for reference
+~sineSynthGain = 0.02;
+~liveMicInputGain = 0.9;
+~liveMicLimiter = 0.03;
+~liveMicAmp = 0.1;
+~fieldPlaybackAmp = 0.15;
+~pianoAmp = 0.05;

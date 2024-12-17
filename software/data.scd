@@ -16,7 +16,7 @@ mics 1-3 at 10db
 mic 4 (cello) at 8 db
 */
 ~inputOffset = 2; // if not starting with first input
-~sineSynthGain = 0.03;
+~sineSynthGain = 0.02;
 ~liveMicInputGain = 0.9;
 ~liveMicLimiter = 0.03;
 ~liveMicAmp = 0.1;

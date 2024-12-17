@@ -35,3 +35,4 @@ o.outDevice_("Audient EVO16");
 s.boot;
 // boot synth, go to synths.scd and add synths
 s.meter;
+s.plotTree;
